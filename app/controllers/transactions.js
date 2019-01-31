@@ -134,7 +134,8 @@ exports.list = function (req, res, next) {
   var pageLength = 10;
   var pagesTotal = 1;
   var txLength;
-  var txs;
+  var txs = [];
+
 
   if (fromBlock && toBlock) {
 
