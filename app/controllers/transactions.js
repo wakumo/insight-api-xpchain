@@ -150,7 +150,6 @@ exports.list = function(req, res, next) {
       }
 
       res.jsonp({
-        pagesTotal: pagesTotal,
         txs: results
       });
     });
