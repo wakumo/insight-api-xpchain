@@ -125,7 +125,7 @@ var fromHashWithInfo = function (hashStr, cb) {
  * List of transaction
  */
 exports.list = function (req, res, next) {
-  var fromBlock = req.query.from;
+  // var fromBlock = req.query.from;
   var toBlock = req.query.to;
 
   var bId = req.query.block;
@@ -137,11 +137,11 @@ exports.list = function (req, res, next) {
   var txs = [];
 
 
-  if (fromBlock && toBlock) {
-
+  // if (fromBlock && toBlock) {
+  if (toBlock) {
     var bIndexes = [];
 
-    for (var bIndex = fromBlock; bIndex < toBlock; bIndex++) {
+    for (var bIndex = toBlock - 10; bIndex <= toBlock; bIndex++) {
       bIndexes.push(bIndex);
     }
 
