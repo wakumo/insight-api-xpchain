@@ -121,13 +121,13 @@ exports.list = function(req, res, next) {
   var pageLength = 10;
   var pagesTotal = 1;
   var txLength;
-  var txs;
+  var txs = [];
 
-  if (fromBlock) && (toBlock) {
+  if ((fromBlock) && (toBlock)) {
 
     for(var bIndex = fromBlock; bIndex < toBlock; bIndex ++) {
 
-      bdb.blockIndex(height, function(err, hashStr) {
+      bdb.blockIndex(bIndex, function(err, hashStr) {
         if (err) {
           console.log(err);
           res.status(400).send('Bad Request');
@@ -137,7 +137,7 @@ exports.list = function(req, res, next) {
               console.log(err);
               return res.status(500).send('Internal Server Error');
             }
-            txs.push(block.info.tx);
+            txs = txs.concat(block.info.tx);
           });
         }
       });
