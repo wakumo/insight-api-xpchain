@@ -112,15 +112,50 @@ var getTransaction = function(txid, cb) {
  * List of transaction
  */
 exports.list = function(req, res, next) {
+  var fromBlock = req.query.from;
+  var toBlock = req.query.to;
+
   var bId = req.query.block;
   var addrStr = req.query.address;
   var page = req.query.pageNum;
   var pageLength = 10;
   var pagesTotal = 1;
   var txLength;
-  var txs;
+  var txs = [];
 
-  if (bId) {
+  if ((fromBlock) && (toBlock)) {
+
+    for(var bIndex = fromBlock; bIndex < toBlock; bIndex ++) {
+
+      bdb.blockIndex(bIndex, function(err, hashStr) {
+        if (err) {
+          console.log(err);
+          res.status(400).send('Bad Request');
+        } else {
+          bdb.fromHashWithInfo(hashStr, function(err, block) {
+            if (err) {
+              console.log(err);
+              return res.status(500).send('Internal Server Error');
+            }
+            txs = txs.concat(block.info.tx);
+          });
+        }
+      });
+    }
+
+    async.mapSeries(txs, getTransaction, function(err, results) {
+      if (err) {
+        console.log(err);
+        res.status(404).send('TX not found');
+      }
+
+      res.jsonp({
+        txs: results
+      });
+    });
+
+  }
+  else if (bId) {
     bdb.fromHashWithInfo(bId, function(err, block) {
       if (err) {
         console.log(err);
