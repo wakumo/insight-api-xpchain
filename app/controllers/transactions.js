@@ -161,7 +161,6 @@ exports.list = function (req, res, next) {
           for (var i = 0; i < blocks.length; i++) {
             Array.prototype.push.apply(txs, blocks[i].info.tx);
           }
-          console.log(txs);
           async.mapSeries(txs, getTransaction, function (err, results) {
             if (err) {
               console.log(err);
