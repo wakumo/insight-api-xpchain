@@ -125,7 +125,8 @@ var fromHashWithInfo = function (hashStr, cb) {
  * List of transaction
  */
 exports.list = function (req, res, next) {
-  // var fromBlock = req.query.from;
+  console.log(req.query);
+  var fromBlock = req.query.from;
   var toBlock = req.query.to;
 
   var bId = req.query.block;
@@ -137,29 +138,30 @@ exports.list = function (req, res, next) {
   var txs = [];
 
 
-  // if (fromBlock && toBlock) {
-  if (toBlock) {
+  if (fromBlock && toBlock) {
     var bIndexes = [];
 
-    for (var bIndex = toBlock - 10; bIndex <= toBlock; bIndex++) {
+    for (var bIndex = fromBlock; bIndex <= toBlock; bIndex++) {
       bIndexes.push(bIndex);
     }
 
-    async.mapSeries(bIndexes, blockIndex, function (err, hashStrs) {
-      console.log(hashStrs);
+    async.mapSeries(bIndexes, blockIndex, function (err, blocks) {
+      var hashStrs = blocks.map(function (block) {
+        return block.blockHash;
+      });
       if (err) {
         console.log(err);
         res.status(400).send('Bad Request');
       } else {
         async.mapSeries(hashStrs, fromHashWithInfo, function (err, blocks) {
-          console.log(blocks.length);
           if (err) {
             console.log(err);
             return res.status(500).send('Internal Server Error');
           }
           for (var i = 0; i < blocks.length; i++) {
-            txs.push(blocks[i].info.tx);
+            Array.prototype.push.apply(txs, blocks[i].info.tx);
           }
+          console.log(txs);
           async.mapSeries(txs, getTransaction, function (err, results) {
             if (err) {
               console.log(err);
